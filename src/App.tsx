@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import './App.css';
 import {Header} from "./Header";
-import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import {BrowserRouter as Router, Redirect, Route, Switch} from "react-router-dom";
 import {WatchPage} from "./WatchPage";
 import SearchPanel from "./panels/searchPanel/SearchPanel";
 import {Worker} from "@react-pdf-viewer/core";
@@ -9,48 +9,75 @@ import {ICsrfToken} from "./api/interfaces/ICsrfToken";
 import {Login} from "./Login";
 import {SecureApi} from "./api/SecureApi";
 import {AdminPanel} from "./AdminPanel";
-
+import UserContext from "./context/UserContext";
+import {message, Spin} from "antd";
 
 function App() {
+    let [userInfo, setUserInfo] = useState<ICsrfToken | null>();
+    let [isLoad, setIsLoad] = useState<boolean>(true);
+    const value = {userInfo, setUserInfo};
+
     let api = new SecureApi();
-    let [token, setToken] = useState<ICsrfToken | null>();
     const fetchToken = () => {
-        api.getCsrfToken().then(value => setToken(value)).catch(() => setToken(null))
+        setIsLoad(true);
+        api.getCsrfToken()
+            .then(value => {
+                setUserInfo(value);
+            })
+            .catch(() => Promise.reject())
+            .finally(() => setIsLoad(false));
     }
     const onLogin = (value: FormData) => {
-        api.login(value).then(value => {
-            fetchToken();
-        })
+        api.login(value)
+            .then(value => {
+                fetchToken();
+            })
+            .catch((e) => {
+                message.error(e);
+            })
     }
     const onLogout = () => {
-        console.log("token");
-        setToken(null);
+        setUserInfo(null);
     }
     React.useEffect(() => {
-        console.log("run");
         fetchToken();
     }, []);
-    console.log("iasdmin", token, token?.admin);
     return (
-        <Router>
-            {token &&
-            <Switch>
-                {token.admin && <Route path={"/adminpanel"}>
-                    <AdminPanel token={token}/>
-                </Route>}
-                <Route path="/watch/:domain/:docname">
-                    <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.14.305/build/pdf.worker.min.js">
-                        <WatchPage/>
-                    </Worker>
-                </Route>
-                <Route path={"/"}>
-                    <Header name={token.name} onLogout={onLogout}/>
-                    <SearchPanel token={token}/>
-                </Route>
-
-            </Switch>}
-            {!token && <Login onLogin={onLogin}/>}
-        </Router>
+        <UserContext.Provider value={value}>
+            {!isLoad && <Router>
+                <Switch>
+                    {userInfo &&
+                    <Switch>
+                        <Route path={"/login"}>
+                            <Redirect to="/"/>
+                        </Route>
+                        {userInfo.admin &&
+                        <Route path={"/adminpanel"}>
+                            <AdminPanel/>
+                        </Route>
+                        }
+                        <Route path="/watch/:domain/:docname">
+                            <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.14.305/build/pdf.worker.min.js">
+                                <WatchPage/>
+                            </Worker>
+                        </Route>
+                        <Route path={"/"}>
+                            <Header name={userInfo.name} onLogout={onLogout}/>
+                            <SearchPanel/>
+                        </Route>
+                    </Switch>
+                    }
+                    {!userInfo &&
+                    <Route path={"/login"}>
+                        <Login onLogin={onLogin}/>
+                    </Route>
+                    }
+                    {!userInfo && <Redirect to="/login"/>}
+                </Switch>
+            </Router>
+            }
+            {isLoad && <Spin size="large" />}
+        </UserContext.Provider>
     );
 }
 
