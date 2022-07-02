@@ -1,16 +1,13 @@
 import {QueryFlag} from "./QueryFlag";
 import {SearchResponse} from "./interfaces/SearchResponse";
 import {PhraseSuggestResponse} from "./interfaces/PhraseSuggestResponse";
-import {ICsrfToken} from "./interfaces/ICsrfToken";
 
 export class SearchApi {
-    token: ICsrfToken
     requestHeaders: HeadersInit
 
-    constructor(token: ICsrfToken) {
-        this.token = token;
+    constructor(token: String) {
         this.requestHeaders = new Headers();
-        this.requestHeaders.set('X-CSRF-TOKEN', token.token.toString());
+        this.requestHeaders.set('X-CSRF-TOKEN', token.toString());
         this.requestHeaders.set('Content-Type', 'application/json;charset=utf-8');
     }
 
