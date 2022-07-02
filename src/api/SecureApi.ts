@@ -7,9 +7,9 @@ export class SecureApi {
             method: 'GET'
         }).then(response => {
             if (response.status == 401)
-                return Promise.reject("unauthorized").then(v => v)
+                return Promise.reject("unauthorized");
             if (response.status == 403)
-                return Promise.reject("forbidden").then(v => v)
+                return Promise.reject("forbidden");
             return response.json().then(value => value as ICsrfToken);
         })
     }
@@ -18,7 +18,12 @@ export class SecureApi {
         return fetch("/login", {
             method: 'POST',
             body: formData
-        }).then(value => value.text());
+        }).then(response => {
+          if (response.ok) {
+              return response.text();
+          }
+          return Promise.reject("Неверное имя пользователя или пароль!");
+        })
     }
 
     logout = () => {

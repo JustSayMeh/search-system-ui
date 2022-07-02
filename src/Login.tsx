@@ -7,7 +7,6 @@ interface Props {
 }
 
 export const Login: FunctionComponent<Props> = ({onLogin}) => {
-
     // @ts-ignore
     const onFinish = (values) => {
         console.log(values);
