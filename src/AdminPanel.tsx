@@ -2,22 +2,22 @@ import React, {FunctionComponent, useRef, useState} from "react";
 import {Button, Modal, Select, Typography, Upload} from "antd";
 import {UploadOutlined} from "@ant-design/icons";
 import {SearchApi} from "./api/SearchApi";
-import {ICsrfToken} from "./api/interfaces/ICsrfToken";
 import {RcFile} from "antd/es/upload";
+import UserContext from "./context/UserContext";
 
 const {Title, Paragraph, Text, Link} = Typography;
 const {Option} = Select;
 
 interface Props {
-    token: ICsrfToken
 }
 
-export const AdminPanel: FunctionComponent<Props> = ({token}) => {
+export const AdminPanel: FunctionComponent<Props> = ({}) => {
     const [isUploadModalVisible, setUploadModalVisible] = useState<boolean>(false);
     const [domains, setDomains] = useState<Array<JSX.Element>>(new Array<JSX.Element>());
     const rcFile = useRef<RcFile>(null);
     const domainRef = useRef<String | null>(null);
-    const searchApi = new SearchApi(token);
+    const {userInfo} = React.useContext(UserContext);
+    const searchApi = new SearchApi(userInfo?.token ? userInfo?.token : "");
     React.useEffect(() => {
         searchApi.getDomains().then(values => {
                 let elemsArr = new Array<JSX.Element>()

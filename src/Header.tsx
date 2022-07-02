@@ -5,7 +5,7 @@ import {SecureApi} from "./api/SecureApi";
 const {Title, Paragraph, Text, Link} = Typography;
 
 interface Props {
-    name: String,
+    name: String | undefined,
     onLogout: () => void;
 }
 

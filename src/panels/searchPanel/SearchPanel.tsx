@@ -13,7 +13,7 @@ import {MatchDocPanel} from "../MatchDocPanel";
 import {DocSearchResponse} from "../../api/interfaces/DocSearchResponse";
 import {ViewMode} from "../ViewMode";
 import {MatchPagesPanel} from "../MatchPagesPanel";
-import {ICsrfToken} from "../../api/interfaces/ICsrfToken";
+import UserContext from "../../context/UserContext";
 
 const {Option} = Select;
 
@@ -29,10 +29,10 @@ interface IFileBlob {
 }
 
 interface Props {
-    token: ICsrfToken
+
 }
 
-const SearchPanel: FunctionComponent<Props> = ({token}) => {
+const SearchPanel: FunctionComponent<Props> = ({}) => {
     const [options, setOptions] = useState<Array<ISuggestPanel>>([]);
     const [matchItems, setMatchItems] = useState<Array<SearchResponse>>([]);
     const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.PAGES);
@@ -42,8 +42,9 @@ const SearchPanel: FunctionComponent<Props> = ({token}) => {
     const fileBlob = useRef<IFileBlob | null>(null);
     const domainRef = useRef<Array<String>>([]);
     const {Panel} = Collapse;
-    const searchApi = new SearchApi(token);
+    const {userInfo} = React.useContext(UserContext);
     let FileSaver = require('file-saver');
+    const searchApi = new SearchApi(userInfo?.token ? userInfo?.token : "");
     const loadFile = async (domain: String, filename: String) => {
         let data = await searchApi.loadFileRequest(domain, filename);
         // TODO как - то достать mime из имени файла
@@ -146,10 +147,11 @@ const SearchPanel: FunctionComponent<Props> = ({token}) => {
             }
         )
     }, [])
+    document.title = "Поисковик"
     return (
         <section id='header' className='container'
                  style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-            <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+            <div style={{display: "flex", flexDirection: "column", alignItems: "center", width: "80%"}}>
                 <Radio.Group value={searchType} onChange={(e) => setSearchType(e.target.value)}>
                     <Radio value={QueryFlag.WORD}>По словам</Radio>
                     <Radio value={QueryFlag.PHRASE}>По фразам</Radio>
