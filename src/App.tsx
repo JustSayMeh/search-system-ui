@@ -76,7 +76,16 @@ function App() {
                 </Switch>
             </Router>
             }
-            {isLoad && <Spin size="large" />}
+            {isLoad && <div style={{
+                position: "fixed",
+                height: "100%",
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+            }}>
+                <Spin size="large"/>
+            </div>}
         </UserContext.Provider>
     );
 }
