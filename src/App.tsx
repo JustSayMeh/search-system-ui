@@ -8,7 +8,7 @@ import {Worker} from "@react-pdf-viewer/core";
 import {ICsrfToken} from "./api/interfaces/ICsrfToken";
 import {Login} from "./Login";
 import {SecureApi} from "./api/SecureApi";
-import {AdminPanel} from "./AdminPanel";
+import {AdminPanel} from "./adminPanel/AdminPanel";
 import UserContext from "./context/UserContext";
 import {message, Spin} from "antd";
 

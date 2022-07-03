@@ -29,7 +29,7 @@ code {
     background: var(--color-bg);
     height: 15vh;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
