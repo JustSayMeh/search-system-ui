@@ -52,28 +52,4 @@ export class SearchApi {
                 );
         })
     }
-
-    loadFileRequest = (domain: String, filename: String) => {
-        return fetch("/files/download/" + domain + "/" + filename, {
-            method: 'GET'
-        }).then(response => {
-            if (response.status == 401)
-                return Promise.reject("unauthorized").then(v => v)
-            if (response.status == 403)
-                return Promise.reject("forbidden").then(v => v)
-            return response.arrayBuffer();
-        })
-    }
-
-    getDomains = () => {
-        return fetch("/files/domains", {
-            method: 'GET'
-        }).then(response => {
-            if (response.status == 401)
-                return Promise.reject("unauthorized").then(v => v)
-            if (response.status == 403)
-                return Promise.reject("forbidden").then(v => v)
-            return response.json().then(value => value as Array<String>);
-        })
-    }
 }

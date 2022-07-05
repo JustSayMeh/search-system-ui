@@ -39,7 +39,7 @@ export const WatchPage: FunctionComponent = () => {
             <div style={{height: "100vh", border: '1px solid rgba(0, 0, 0, 0.3)', width: "100%"}}>
 
                 <Viewer
-                    fileUrl={'/files/download/' + domain + '/' + docname}
+                    fileUrl={'/docs/' + domain + '/' + docname}
                     // @ts-ignore
                     initialPage={+GetPage() - 1}
                     plugins={[defaultLayoutPluginInstance, searchPluginInstance]}

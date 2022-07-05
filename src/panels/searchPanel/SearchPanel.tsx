@@ -14,6 +14,7 @@ import {DocSearchResponse} from "../../api/interfaces/DocSearchResponse";
 import {ViewMode} from "../ViewMode";
 import {MatchPagesPanel} from "../MatchPagesPanel";
 import UserContext from "../../context/UserContext";
+import {DocsApi} from "../../api/DocsApi";
 
 const {Option} = Select;
 
@@ -39,24 +40,11 @@ const SearchPanel: FunctionComponent<Props> = ({}) => {
     const [matchedElems, setMatchedElems] = useState<Array<JSX.Element>>([<></>]);
     const [searchType, setSearchType] = useState<QueryFlag>(QueryFlag.WORD)
     const [domains, setDomains] = useState<Array<JSX.Element>>(new Array<JSX.Element>());
-    const fileBlob = useRef<IFileBlob | null>(null);
     const domainRef = useRef<Array<String>>([]);
     const {Panel} = Collapse;
     const {userInfo} = React.useContext(UserContext);
-    let FileSaver = require('file-saver');
     const searchApi = new SearchApi(userInfo?.token ? userInfo?.token : "");
-    const loadFile = async (domain: String, filename: String) => {
-        let data = await searchApi.loadFileRequest(domain, filename);
-        // TODO как - то достать mime из имени файла
-        let blob = new Blob([data], {type: "application/pdf;charset=utf-8"});
-        FileSaver.saveAs(blob, filename);
-    }
-    const handleOk = () => {
-        if (fileBlob.current) {
-            loadFile(fileBlob.current.domain, fileBlob.current.filename).then(() => {
-            });
-        }
-    }
+    const docsApi = new DocsApi();
     const fetchSuggest = async (text: String) => {
         let optionsArray = [];
         let values = await searchApi.suggestRequest(text);
@@ -137,7 +125,7 @@ const SearchPanel: FunctionComponent<Props> = ({}) => {
     }
     console.log(domains);
     React.useEffect(() => {
-        searchApi.getDomains().then(values => {
+        docsApi.getDomains().then(values => {
                 let elemsArr = new Array<JSX.Element>()
                 for (let domain of values) {
                     // @ts-ignore

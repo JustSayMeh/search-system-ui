@@ -1,12 +1,12 @@
 import React, {FunctionComponent, useState} from "react";
 import {Menu, Select, Typography} from "antd";
 import {MenuFoldOutlined, MenuUnfoldOutlined, ProfileOutlined, UserOutlined} from "@ant-design/icons";
-import {SearchApi} from "../api/SearchApi";
 import UserContext from "../context/UserContext";
 import 'antd/dist/antd.css';
 import {MenuInfo} from 'rc-menu/lib/interface'
 import {DocsMenuItem} from "./menuItems/DocsMenuItem";
 import {UsersMenuItem} from "./menuItems/UsersMenuItem";
+import {DocsApi} from "../api/DocsApi";
 
 const {Title, Paragraph, Text, Link} = Typography;
 const {Option} = Select;
@@ -22,18 +22,20 @@ enum MenuItemType {
 
 export const AdminPanel: FunctionComponent<Props> = ({}) => {
     const [collapsedMenu, setCollapsedMenu] = useState<boolean>(true);
+    const [isLoad, setIsLoad] = useState<boolean>(true);
     const [selectedItem, setSelectedItem] = useState<MenuItemType>(MenuItemType.DOCS);
     const [domains, setDomains] = useState<Array<JSX.Element>>(new Array<JSX.Element>());
     const {userInfo} = React.useContext(UserContext);
-    const searchApi = new SearchApi(userInfo?.token ? userInfo?.token : "");
+    const docsApi = new DocsApi();
     React.useEffect(() => {
-        searchApi.getDomains().then(values => {
+        docsApi.getDomains().then(values => {
                 let elemsArr = new Array<JSX.Element>()
                 for (let domain of values) {
                     // @ts-ignore
                     elemsArr.push(<Option key={domain}>{domain}</Option>)
                 }
                 setDomains(elemsArr);
+                setIsLoad(false);
             }
         )
     }, [])
@@ -65,7 +67,7 @@ export const AdminPanel: FunctionComponent<Props> = ({}) => {
     }
     let collapseItem = collapsedMenu ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>
     // @ts-ignore
-    return (<>
+    return (<>{!isLoad && <>
         <div className={"Header"}>
             <Typography style={{
                 display: "flex",
@@ -98,10 +100,10 @@ export const AdminPanel: FunctionComponent<Props> = ({}) => {
                     ]}
                 />
             </div>
-            <div style={{backgroundColor: "red", flexGrow: 1, height: "50vh"}}>
-                {selectedItem == MenuItemType.DOCS && <DocsMenuItem/>}
+            <div style={{flexGrow: 1, height: "50vh"}}>
+                {selectedItem == MenuItemType.DOCS && <DocsMenuItem domains={domains}/>}
                 {selectedItem == MenuItemType.ACCOUNTS && <UsersMenuItem/>}
             </div>
         </div>
-    </>);
+    </>}</>);
 }
