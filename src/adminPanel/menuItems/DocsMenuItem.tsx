@@ -1,18 +1,24 @@
-import {FunctionComponent, useRef, useState} from "react";
+import React, {FunctionComponent, useRef, useState} from "react";
 import {Button, message, Modal, Select} from "antd";
 import {DocsApi} from "../../api/DocsApi";
 import {UploadOutlined} from "@ant-design/icons";
+import {FolderTree} from "../../folderTree/FolderTree";
+
+const {Option} = Select;
 
 interface Props {
-    domains: Array<JSX.Element>
+
 }
 
-export const DocsMenuItem: FunctionComponent<Props> = ({domains}) => {
+export const DocsMenuItem: FunctionComponent<Props> = ({}) => {
     const [isNewFileModalVisible, setNewFileModalVisible] = useState<boolean>(false);
     // @ts-ignore
-    const [selectedDomain, setSelectedDomain] = useState<String>(domains[0].key);
+    const [isLoad, setIsLoad] = useState<boolean>(false);
+    const [domains, setDomains] = useState<Array<JSX.Element>>(new Array<JSX.Element>());
+    const [selectedDomain, setSelectedDomain] = useState<String>("");
     const [uploadedFileName, setUploadedFileName] = useState<String | null>(null);
     const uploadNewFile = useRef<HTMLInputElement | null>(null);
+    const [docsTree, setDocsTree] = useState<Map<String, Array<String>>>(new Map());
     let docsApi = new DocsApi();
     const handleOk = () => {
         if (!uploadNewFile.current || !uploadNewFile.current.files)
@@ -32,15 +38,33 @@ export const DocsMenuItem: FunctionComponent<Props> = ({domains}) => {
             message.error("Что-то пошло не так");
         });
     }
+    const fetchDomains = () => {
+        docsApi.getDocsTree().then(map => {
+                let domains = Object.keys(map);
+                console.log(domains, map)
+                let elemsArr = new Array<JSX.Element>()
+                for (let domain of domains) {
+                    // @ts-ignore
+                    elemsArr.push(<Option key={domain}>{domain}</Option>)
+                }
+                setDomains(elemsArr);
+                setDocsTree(map);
+                setIsLoad(true);
+            }
+        )
+    }
     const handleCancel = () => {
         setNewFileModalVisible(false);
     }
-    console.log(domains.length);
+    React.useEffect(() => {
+        fetchDomains();
+    }, [])
     return (<>
-        {domains.length > 0 && <>
+        {isLoad && <>
             <Button onClick={() => {
                 setNewFileModalVisible(true)
             }}>Загрузить</Button>
+            <FolderTree domains={docsTree} onUpdateDocs={fetchDomains}/>
             <Modal title="Загрузка файлов"
                    onCancel={handleCancel}
                    visible={isNewFileModalVisible}
