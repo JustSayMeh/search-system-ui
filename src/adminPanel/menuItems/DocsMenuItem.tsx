@@ -59,9 +59,9 @@ export const DocsMenuItem: FunctionComponent<Props> = ({}) => {
     React.useEffect(() => {
         fetchDomains();
     }, [])
-    return (<>
+    return (<div style={{display: "flex", flexDirection: "column"}}>
         {isLoad && <>
-            <Button onClick={() => {
+            <Button style={{alignSelf: "flex-end"}} onClick={() => {
                 setNewFileModalVisible(true)
             }}>Загрузить</Button>
             <FolderTree domains={docsTree} onUpdateDocs={fetchDomains}/>
@@ -112,5 +112,5 @@ export const DocsMenuItem: FunctionComponent<Props> = ({}) => {
             </Modal>
         </>
         }
-    </>)
+    </div>)
 }
