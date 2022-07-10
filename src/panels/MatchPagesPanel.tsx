@@ -10,7 +10,7 @@ interface Props {
 export const MatchPagesPanel: FunctionComponent<Props> = ({docName, domain, matchCount}) => {
     return (<Card style={{display: "flex", flexDirection: "column"}}>
         <div style={{display: "flex", flexDirection: "row"}}>
-            <img src={"/files/download/title/" + domain + "/" + docName} style={{width: 250, height: "auto"}}/>
+            <img src={"/docs/title/image/" + domain + "/" + docName} style={{width: 250, height: "auto"}}/>
             <div style={{display: "flex", flexDirection: "column"}}>
                 <h1><a target="_blank"
                        href={"/watch/" + domain + "/" + docName}>
